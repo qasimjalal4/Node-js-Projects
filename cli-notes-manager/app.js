@@ -133,12 +133,24 @@ async function main() {
  await setup() 
 
  if(command === 'add') {
+
+  if(!note) {
+    console.log('Please provide a note too!')
+    return
+  }
+
   await addNote()
   console.log('Note added successfully!')
+  
+
  } else if(command === 'list') {
   await listNotes()
+
  } else if(command === 'delete') {
   await deleteNote()
+
+ } else {
+  console.log('Unknown command!')
  }
 }
 
