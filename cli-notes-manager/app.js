@@ -85,7 +85,47 @@ async function listNotes() {
 
 }
 
-main()
+
+async function deleteNote() {
+
+  const id = Number(process.argv[3])
+
+  try {
+
+      const data = await fs.readFile(filePath,'utf8')
+      const notes = JSON.parse(data)
+
+      
+      const noteExists = notes.some(note => note.id === id)
+
+      if(noteExists) {
+        const newNotes = notes.filter(note => note.id !== id)
+      
+        newNotes.forEach((note,index) => {
+         note.id = index + 1
+        })
+
+        const JsonData = JSON.stringify(newNotes,null,2)
+
+        await fs.writeFile(filePath,JsonData)
+
+        console.log('Note deleted!')
+
+      } else {
+        console.log(`Note ${id} not found!`)
+      }
+ 
+
+  } catch(error) {
+
+    console.log(error.message)
+  }
+  
+}
+
+
+
+ 
  
 
 async function main() {
@@ -97,6 +137,10 @@ async function main() {
   console.log('Note added successfully!')
  } else if(command === 'list') {
   await listNotes()
+ } else if(command === 'delete') {
+  await deleteNote()
  }
 }
 
+
+main()
