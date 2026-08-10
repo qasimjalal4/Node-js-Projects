@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
-
+import { addNote, listNotes, deleteNote } from './notes.js'
 
 const command = process.argv[2]
 const note = process.argv[3]
@@ -38,92 +38,7 @@ async function setup() {
 
 
 
-
-
-async function addNote() {
-
-  try {
-
-   const data = await fs.readFile(filePath,'utf8')
-   const notes = JSON.parse(data)
-
-
-   notes.push({
-    id: notes.length + 1,
-    text: note
-   })
-
-   const JsonData = JSON.stringify(notes,null,2)
-
-   await fs.writeFile(filePath, JsonData)
-
-  } catch(error) {
-
-    console.log(error.message)
-  }
-
-}
-
-
-
-async function listNotes() {
-
-  try {
-
-    const data = await fs.readFile(filePath,'utf8')
-    const notes = JSON.parse(data)
-    
-    notes.forEach((note) => {
-      console.log(`${note.id}. ${note.text}`)
-    })
-
-  } catch(error) {
-
-    console.log(error.message)
-  }
-
-
-}
-
-
-async function deleteNote() {
-
-  const id = Number(process.argv[3])
-
-  try {
-
-      const data = await fs.readFile(filePath,'utf8')
-      const notes = JSON.parse(data)
-
-      
-      const noteExists = notes.some(note => note.id === id)
-
-      if(noteExists) {
-        const newNotes = notes.filter(note => note.id !== id)
-      
-        newNotes.forEach((note,index) => {
-         note.id = index + 1
-        })
-
-        const JsonData = JSON.stringify(newNotes,null,2)
-
-        await fs.writeFile(filePath,JsonData)
-
-        console.log('Note deleted!')
-
-      } else {
-        console.log(`Note ${id} not found!`)
-      }
  
-
-  } catch(error) {
-
-    console.log(error.message)
-  }
-  
-}
-
-
 
  
  
@@ -139,15 +54,17 @@ async function main() {
     return
   }
 
-  await addNote()
+  await addNote(filePath,note)
   console.log('Note added successfully!')
   
 
  } else if(command === 'list') {
-  await listNotes()
+  await listNotes(filePath)
 
  } else if(command === 'delete') {
-  await deleteNote()
+
+  const id = Number(process.argv[3])
+  await deleteNote(filePath,id)
 
  } else {
   console.log('Unknown command!')
