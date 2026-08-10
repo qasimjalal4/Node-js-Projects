@@ -1,10 +1,9 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { text } from 'stream/consumers'
 import { fileURLToPath } from 'url'
 
 
-const command = processa.argv[2]
+const command = process.argv[2]
 const note = process.argv[3]
 
 const __filename = fileURLToPath(import.meta.url)
@@ -30,7 +29,6 @@ async function setup() {
 
    }
 
-   console.log('Set up complete')
  } catch(error) {
 
    console.log('sSet up failed: ',error.message)
@@ -38,7 +36,7 @@ async function setup() {
 
 }
 
-setup()
+
 
 
 
@@ -64,12 +62,41 @@ async function addNote() {
     console.log(error.message)
   }
 
+}
 
+
+
+async function listNotes() {
+
+  try {
+
+    const data = await fs.readFile(filePath,'utf8')
+    const notes = JSON.parse(data)
+    
+    notes.forEach((note) => {
+      console.log(`${note.id}. ${note.text}`)
+    })
+
+  } catch(error) {
+
+    console.log(error.message)
+  }
+
+
+}
+
+main()
+ 
+
+async function main() {
   
-}
+ await setup() 
 
-
-if(command === 'add') {
-  addNote()
+ if(command === 'add') {
+  await addNote()
   console.log('Note added successfully!')
+ } else if(command === 'list') {
+  await listNotes()
+ }
 }
+
