@@ -1,7 +1,11 @@
 import fs from 'fs/promises'
 import path from 'path'
+import { text } from 'stream/consumers'
 import { fileURLToPath } from 'url'
 
+
+const command = processa.argv[2]
+const note = process.argv[3]
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -35,3 +39,37 @@ async function setup() {
 }
 
 setup()
+
+
+
+async function addNote() {
+
+  try {
+
+   const data = await fs.readFile(filePath,'utf8')
+   const notes = JSON.parse(data)
+
+
+   notes.push({
+    id: notes.length + 1,
+    text: note
+   })
+
+   const JsonData = JSON.stringify(notes,null,2)
+
+   await fs.writeFile(filePath, JsonData)
+
+  } catch(error) {
+
+    console.log(error.message)
+  }
+
+
+  
+}
+
+
+if(command === 'add') {
+  addNote()
+  console.log('Note added successfully!')
+}
