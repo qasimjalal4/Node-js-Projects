@@ -16,7 +16,13 @@ async function setup() {
 
     await fs.mkdir(folderPath, {recursive: true})
 
+   try {
+    await fs.access(filePath)
+
+   } catch(error) {
+
     await fs.writeFile(filePath, '[]')
+   }
 
 
   } catch(error) {
