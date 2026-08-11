@@ -62,6 +62,26 @@ async function  addExpense() {
 }
 
 
+async function listExpenses() {
+
+  try {
+
+    const data = await fs.readFile(filePath,'utf8')
+    const expenses = JSON.parse(data)
+
+    for(let expense of expenses) {
+      console.log(`${expense.id}. ${expense.name} - ${expense.price}`)
+    }
+
+
+
+  } catch(error) {
+
+    console.log(error)
+  }
+  
+}
+
 
 async function main() {
 
@@ -69,6 +89,8 @@ async function main() {
 
   if(command === 'add') {
     await addExpense()
+  } else if(command === 'list') {
+    await listExpenses()
   } else {
     console.log('Unknown command!')
   }
