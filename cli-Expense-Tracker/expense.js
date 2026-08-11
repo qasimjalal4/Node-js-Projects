@@ -51,6 +51,26 @@ export async function deleteExpense(filePath,id) {
 
   try {
 
+    const data = await fs.readFile(filePath,'utf8')
+    const expenses = JSON.parse(data)
+
+    const expenseExists = expenses.some(expense => expense.id === id)
+
+    if(!expenseExists) {
+      console.log(`Expense with id ${expense.id} doesnt exist!`)
+      return
+    }
+
+    const newExpenses = expenses.filter(expense => expense.id !== id)
+
+    newExpenses.forEach((expense,index) => {
+      expense.id = index + 1
+    })
+
+    const JsonData = JSON.stringify(newExpenses,null,2)
+
+    await fs.writeFile(filePath,JsonData)
+
 
   } catch(error) {
 
