@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import {addExpense, listExpenses, deleteExpense} from './expense.js'
+import {addExpense, listExpenses, deleteExpense, calculateTotal} from './expense.js'
 
 const command = process.argv[2]
 const expense = process.argv[3]
@@ -53,6 +53,9 @@ async function main() {
   } else if(command === 'delete') {
     const id = Number(process.argv[3])
     await deleteExpense(filePath,id)
+  
+  } else if(command === 'total') {
+    await calculateTotal(filePath)
 
   } else {
     console.log('Unknown command!')

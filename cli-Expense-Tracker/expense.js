@@ -78,3 +78,18 @@ export async function deleteExpense(filePath,id) {
   }
   
 }
+
+
+export async function calculateTotal(filePath) {
+
+  const data = await fs.readFile(filePath, 'utf8')
+  const expenses = JSON.parse(data)
+
+  const total = expenses.reduce((sum,expense) => {
+    return sum + expense.price
+  }, 0)
+
+
+  console.log(`Total amount: ${total}`)
+  
+}
