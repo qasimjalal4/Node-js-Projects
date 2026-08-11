@@ -7,5 +7,25 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const folderPath = path.join(__dirname,'data')
-
 const filePath = path.join(folderPath,'expenses.json')
+
+
+async function setup() {
+
+  try {
+
+    await fs.mkdir(folderPath, {recursive: true})
+
+    await fs.writeFile(filePath, '[]')
+
+
+  } catch(error) {
+
+    console.log(error)
+  }
+
+
+  
+}
+
+setup()
