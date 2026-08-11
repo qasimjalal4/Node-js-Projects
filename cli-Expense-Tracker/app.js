@@ -1,6 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import {addExpense, listExpenses, deleteExpense} from './expense.js'
 
 const command = process.argv[2]
 const expense = process.argv[3]
@@ -20,8 +21,9 @@ async function setup() {
     await fs.mkdir(folderPath, {recursive: true})
 
    try {
-    await fs.access(filePath)
 
+    await fs.access(filePath)
+ 
    } catch(error) {
 
     await fs.writeFile(filePath, '[]')
@@ -35,52 +37,7 @@ async function setup() {
   
 }
 
-
-async function  addExpense() {
-  
-  try {
-
-    const data = await fs.readFile(filePath,'utf8')
-    const expenses = JSON.parse(data)
-
-    expenses.push({
-      id: expenses.length + 1,
-      name: expense,
-      price 
-    })
-
-    const JsonData = JSON.stringify(expenses,null,2)
-
-    await fs.writeFile(filePath,JsonData)
-
-    
-
-  } catch(error) {
-
-    console.log(error)
-  }
-}
-
-
-async function listExpenses() {
-
-  try {
-
-    const data = await fs.readFile(filePath,'utf8')
-    const expenses = JSON.parse(data)
-
-    for(let expense of expenses) {
-      console.log(`${expense.id}. ${expense.name} - ${expense.price}`)
-    }
-
-
-
-  } catch(error) {
-
-    console.log(error)
-  }
-  
-}
+ 
 
 
 async function main() {
@@ -88,9 +45,15 @@ async function main() {
   await setup()
 
   if(command === 'add') {
-    await addExpense()
+    await addExpense(filePath,expense,price)
+
   } else if(command === 'list') {
-    await listExpenses()
+    await listExpenses(filePath)
+
+  } else if(command === 'delete') {
+    const id = Number(process.argv[3])
+    await deleteExpense(filePath,id)
+
   } else {
     console.log('Unknown command!')
   }
