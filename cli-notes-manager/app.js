@@ -13,6 +13,7 @@ const folderPath = path.join(__dirname,'data')
 
 const filePath = path.join(folderPath,'notes.json')
 
+
 async function setup() {
   
  try {
@@ -31,7 +32,7 @@ async function setup() {
 
  } catch(error) {
 
-   console.log('sSet up failed: ',error.message)
+   console.log('Set up failed: ',error.message)
  }
 
 }
