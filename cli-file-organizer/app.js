@@ -1,7 +1,8 @@
 import fs from 'fs/promises'
 import path, { format } from 'path'
  
- 
+
+const command = process.argv[2]
  
 const categories = {
   images: ['.jpg', '.jpeg', '.png', '.gif'],
@@ -42,10 +43,19 @@ async function fileOrganizer() {
   await fs.rename(oldPath,newPath)
 
  }
-
- 
   
 }
 
 
-fileOrganizer()
+
+async function main() {
+  
+  if(command === 'organize') {
+    await fileOrganizer()
+  } else {
+    console.log('Unknown command!')
+  }
+}
+
+
+main()
