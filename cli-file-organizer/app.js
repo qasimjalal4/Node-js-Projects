@@ -25,8 +25,18 @@ async function fileOrganizer() {
   const category = Object.keys(categories).find(category => {
     return categories[category].includes(extension)
 
-    
- })
+  }) 
+
+
+  if(!category) {
+    continue;
+  }
+
+  const categoryPath = path.join(folderPath,category)
+
+  await fs.mkdir(categoryPath,{recursive:true})
+
+
 
  }
 
