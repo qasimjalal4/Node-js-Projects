@@ -22,6 +22,12 @@ async function fileOrganizer() {
 
   const extension = path.extname(file)
 
+  const category = Object.keys(categories).find(category => {
+    return categories[category].includes(extension)
+
+    
+ })
+
  }
 
  
