@@ -36,7 +36,10 @@ async function fileOrganizer() {
 
   await fs.mkdir(categoryPath,{recursive:true})
 
+  const oldPath = path.join(folderPath,file)
+  const newPath = path.join(categoryPath,file)
 
+  await fs.rename(oldPath,newPath)
 
  }
 
