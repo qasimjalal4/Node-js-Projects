@@ -1,5 +1,5 @@
 import fs from 'fs/promises'
-import path from 'path'
+import path, { format } from 'path'
  
  
  
@@ -18,7 +18,13 @@ async function fileOrganizer() {
 
  const files = await fs.readdir(folderPath)
 
-  console.log(files)
+ for(const file of files) {
+
+  const extension = path.extname(file)
+
+ }
+
+ 
   
 }
 
