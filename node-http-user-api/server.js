@@ -1,6 +1,6 @@
-import { error } from 'console'
 import http from 'http'
-import { json } from 'stream/consumers'
+import { use } from 'react'
+
 
 const PORT = 3000
 
@@ -37,6 +37,32 @@ function validateUser(user) {
 
   if(user.age < 0) {
     return 'Age cant be negative'
+  }
+
+  return null
+}
+
+ 
+function validatePatchUser(user) {
+
+  if (user.name !== undefined) {
+
+    if (typeof user.name !== 'string') {
+      return 'Name must be a string'
+    }
+
+  }
+
+  if (user.age !== undefined) {
+
+    if (typeof user.age !== 'number' || Number.isNaN(user.age)) {
+      return 'Age must be a valid number'
+    }
+
+    if (user.age < 0) {
+      return 'Age cannot be negative'
+    }
+
   }
 
   return null
@@ -196,6 +222,78 @@ const server = http.createServer((req,res) => {
         }
 
       })
+
+
+      } else if (req.method === 'PATCH' && parts[1] === 'users' && parts[2]) {
+
+  const id = Number(parts[2])
+
+  const user = users.find(user => user.id === id)
+
+  
+  if (!user) {
+
+    res.statusCode = 404
+    res.setHeader('Content-Type', 'application/json')
+
+    res.end(JSON.stringify({
+      error: 'User not found!'
+    }))
+
+    return
+  }
+
+  let body = ''
+
+  
+  req.on('data', (chunk) => {
+    body += chunk.toString()
+  })
+
+  req.on('end', () => {
+
+    try {
+
+      const updatedUser = JSON.parse(body)
+      const error = validatePatchUser(updatedUser)
+
+      if(error) {
+
+        res.statusCode = 400
+        res.setHeader('Content-Type','application/json')
+        res.end(JSON.stringify({
+          error: error
+        }))
+
+        return
+      }
+  
+      if (updatedUser.name !== undefined) {
+        user.name = updatedUser.name
+      }
+
+      if (updatedUser.age !== undefined) {
+        user.age = updatedUser.age
+      }
+
+      res.statusCode = 200
+      res.setHeader('Content-Type', 'application/json')
+
+      res.end(JSON.stringify({
+        message: 'User updated!',
+        user: user
+      }))
+
+    } catch (error) {
+
+      res.statusCode = 400
+      res.setHeader('Content-Type', 'application/json')
+
+      res.end(JSON.stringify({
+        error: 'Invalid JSON!'
+      }))
+    }
+  })
 
   } else {
 
