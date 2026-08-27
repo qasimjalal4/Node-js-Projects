@@ -104,7 +104,12 @@ const server = http.createServer((req,res) => {
           return
          }
 
-         user.id = users.length + 1
+         const newId =
+          users.length > 0
+          ? Math.max(...users.map(user => user.id)) + 1
+          : 1
+
+         user.id = newId
          users.push(user)
 
          res.statusCode = 201
