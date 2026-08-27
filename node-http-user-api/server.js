@@ -1,5 +1,6 @@
+import { error } from "console";
+import { resolve } from "dns";
 import http from "http";
-import { use } from "react";
 
 const PORT = 3000;
 
@@ -70,93 +71,119 @@ function getUserId(value) {
   return id;
 }
 
-const server = http.createServer((req, res) => {
+
+function sendJSON(res, statusCode, data) {
+  res.statusCode = statusCode;
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
+}
+
+
+function getRequestBody(req) {
+
+  return new Promise((resolve,reject) => {
+
+    let body = ''
+
+    req.on('data', (chunk) => {
+      body += chunk.toString()
+    })
+
+    req.on('end', () => {
+      resolve(body)
+    })
+
+    req.on('error', () => {
+      reject(error)
+    })
+  })
+}
+
+const server = http.createServer( async (req, res) => {
   const parts = req.url.split("/");
 
+  // GET /
   if (req.method === "GET" && req.url === "/") {
     res.statusCode = 200;
     res.setHeader("Content-Type", "text/plain");
     res.end("User Management API");
+
+  // GET /users
   } else if (req.method === "GET" && req.url === "/users") {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify(users));
+    sendJSON(res, 200, users);
+
+  // GET /users/:id
   } else if (req.method === "GET" && parts[1] === "users" && parts[2]) {
-    const id = Number(parts[2]);
+    const id = getUserId(parts[2]);
 
-    const user = users.find((user) => user.id === id);
-
-    if (!user) {
-      res.statusCode = 404;
-      res.setHeader("Content-Type", "text/plain");
-      res.end("User not found!");
+    if (id === null) {
+      sendJSON(res, 400, {
+        error: "Invalid user ID!",
+      });
 
       return;
     }
 
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify(user));
+    const user = users.find((user) => user.id === id);
+
+    if (!user) {
+      sendJSON(res, 404, {
+        error: "User not found!",
+      });
+
+      return;
+    }
+
+    sendJSON(res, 200, user);
+
+  // POST /users
   } else if (req.method === "POST" && req.url === "/users") {
-    let body = "";
+  
 
-    req.on("data", (chunk) => {
-      body += chunk.toString();
-    });
-
-    req.on("end", () => {
       try {
+
+        const body = await getRequestBody(req``)
         const user = JSON.parse(body);
         const error = validateUser(user);
 
         if (error) {
-          res.statusCode = 400;
-          res.setHeader("Content-Type", "application/json");
-          res.end(
-            JSON.stringify({
-              error: error,
-            }),
-          );
+          sendJSON(res, 400, {
+            error: error,
+          });
 
           return;
         }
 
         const newId =
-          users.length > 0 ? Math.max(...users.map((user) => user.id)) + 1 : 1;
+          users.length > 0
+            ? Math.max(...users.map((user) => user.id)) + 1
+            : 1;
 
         user.id = newId;
         users.push(user);
 
-        res.statusCode = 201;
         const response = {
           message: "User created!",
           user: user,
         };
 
-        res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify(response));
+        sendJSON(res, 201, response);
+
       } catch (error) {
-        res.statusCode = 400;
-        res.setHeader("Content-Type", "application/json");
-        res.end(
-          JSON.stringify({
-            error: "Invalid JSON!",
-          }),
-        );
+        sendJSON(res, 400, {
+          error: "Invalid JSON!",
+        });
       }
-    });
+    
+
+  // PUT /users/:id
   } else if (req.method === "PUT" && parts[1] === "users" && parts[2]) {
     const id = getUserId(parts[2]);
 
     if (id === null) {
-      res.statusCode = 400;
-      res.setHeader("Content-Type", "application/json");
-
-      res.end(
-        JSON.stringify({
-          error: "Invalid user ID!",
-        }),
-      );
+      sendJSON(res, 400, {
+        error: "Invalid user ID!",
+      });
 
       return;
     }
@@ -164,36 +191,24 @@ const server = http.createServer((req, res) => {
     const user = users.find((user) => user.id === id);
 
     if (!user) {
-      res.statusCode = 404;
-      res.setHeader("Content-Type", "application/json");
-      res.end(
-        JSON.stringify({
-          error: "User not found!",
-        }),
-      );
+      sendJSON(res, 404, {
+        error: "User not found!",
+      });
 
       return;
     }
 
-    let body = "";
-
-    req.on("data", (chunk) => {
-      body += chunk.toString();
-    });
-
-    req.on("end", () => {
+  
       try {
+
+        const body = await getRequestBody(req)
         const updatedUser = JSON.parse(body);
         const error = validateUser(updatedUser);
 
         if (error) {
-          res.statusCode = 400;
-          res.setHeader("Content-Type", "application/json");
-          res.end(
-            JSON.stringify({
-              error: error,
-            }),
-          );
+          sendJSON(res, 400, {
+            error: error,
+          });
 
           return;
         }
@@ -201,36 +216,28 @@ const server = http.createServer((req, res) => {
         user.name = updatedUser.name;
         user.age = updatedUser.age;
 
-        res.statusCode = 200;
         const response = {
           message: "User updated",
           user: user,
         };
 
-        res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify(response));
+        sendJSON(res, 200, response);
+
       } catch (error) {
-        res.statusCode = 400;
-        res.setHeader("Content-Type", "application/json");
-        res.end(
-          JSON.stringify({
-            error: "Invalid JSON!",
-          }),
-        );
+        sendJSON(res, 400, {
+          error: "Invalid JSON!",
+        });
       }
-    });
+    
+
+  // PATCH /users/:id
   } else if (req.method === "PATCH" && parts[1] === "users" && parts[2]) {
     const id = getUserId(parts[2]);
 
     if (id === null) {
-      res.statusCode = 400;
-      res.setHeader("Content-Type", "application/json");
-
-      res.end(
-        JSON.stringify({
-          error: "Invalid user ID!",
-        }),
-      );
+      sendJSON(res, 400, {
+        error: "Invalid user ID!",
+      });
 
       return;
     }
@@ -238,37 +245,26 @@ const server = http.createServer((req, res) => {
     const user = users.find((user) => user.id === id);
 
     if (!user) {
-      res.statusCode = 404;
-      res.setHeader("Content-Type", "application/json");
-
-      res.end(
-        JSON.stringify({
-          error: "User not found!",
-        }),
-      );
+      sendJSON(res, 404, {
+        error: "User not found!",
+      });
 
       return;
     }
 
     let body = "";
 
-    req.on("data", (chunk) => {
-      body += chunk.toString();
-    });
-
-    req.on("end", () => {
+    
       try {
+
+        const body = await getRequestBody(req)
         const updatedUser = JSON.parse(body);
         const error = validatePatchUser(updatedUser);
 
         if (error) {
-          res.statusCode = 400;
-          res.setHeader("Content-Type", "application/json");
-          res.end(
-            JSON.stringify({
-              error: error,
-            }),
-          );
+          sendJSON(res, 400, {
+            error: error,
+          });
 
           return;
         }
@@ -281,38 +277,26 @@ const server = http.createServer((req, res) => {
           user.age = updatedUser.age;
         }
 
-        res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
+        sendJSON(res, 200, {
+          message: "User updated!",
+          user: user,
+        });
 
-        res.end(
-          JSON.stringify({
-            message: "User updated!",
-            user: user,
-          }),
-        );
       } catch (error) {
-        res.statusCode = 400;
-        res.setHeader("Content-Type", "application/json");
-
-        res.end(
-          JSON.stringify({
-            error: "Invalid JSON!",
-          }),
-        );
+        sendJSON(res, 400, {
+          error: "Invalid JSON!",
+        });
       }
-    });
+    
+
+  // DELETE /users/:id
   } else if (req.method === "DELETE" && parts[1] === "users" && parts[2]) {
     const id = getUserId(parts[2]);
 
     if (id === null) {
-      res.statusCode = 400;
-      res.setHeader("Content-Type", "application/json");
-
-      res.end(
-        JSON.stringify({
-          error: "Invalid user ID!",
-        }),
-      );
+      sendJSON(res, 400, {
+        error: "Invalid user ID!",
+      });
 
       return;
     }
@@ -320,14 +304,9 @@ const server = http.createServer((req, res) => {
     const userExists = users.some((user) => user.id === id);
 
     if (!userExists) {
-      res.statusCode = 404;
-      res.setHeader("Content-Type", "application/json");
-
-      res.end(
-        JSON.stringify({
-          error: "User not found!",
-        }),
-      );
+      sendJSON(res, 404, {
+        error: "User not found!",
+      });
 
       return;
     }
@@ -339,15 +318,12 @@ const server = http.createServer((req, res) => {
     users.length = 0;
     users.push(...remainingUsers);
 
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/json");
+    sendJSON(res, 200, {
+      message: "User deleted!",
+      user: user,
+    });
 
-    res.end(
-      JSON.stringify({
-        message: "User deleted!",
-        user: user,
-      }),
-    );
+  // Unknown route
   } else {
     res.statusCode = 404;
     res.setHeader("Content-Type", "text/plain");
