@@ -16,6 +16,32 @@ const users = [
   }
 ]
 
+function validateUser(user) {
+
+  if(!user.name) {
+    return 'Name is required!'
+  }
+
+  if(!user.age) {
+    return 'Age is required!'
+  }
+
+  if(typeof user.name !== 'string') {
+    return 'Name must be a string type'
+  }
+
+  if(typeof user.age !== 'number') {
+    return 'Age must be number!'
+  }
+
+  if(user.age < 0) {
+    return 'Age cant be negative'
+  }
+
+  return null
+}
+
+
 const server = http.createServer((req,res) => {
 
   const parts = req.url.split('/')
@@ -65,6 +91,18 @@ const server = http.createServer((req,res) => {
       try {
 
          const user = JSON.parse(body)
+         const error = validateUser(user)
+
+         if(error) {
+
+          res.statusCode = 400
+          res.setHeader('Content-Type','application/json')
+          res.end(JSON.stringify({
+            error: error
+          }))
+
+          return
+         }
 
          user.id = users.length + 1
          users.push(user)
