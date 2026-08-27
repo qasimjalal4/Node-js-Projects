@@ -295,6 +295,41 @@ const server = http.createServer((req,res) => {
     }
   })
 
+
+  } else if (req.method === 'DELETE' && parts[1] === 'users' && parts[2]) {
+
+    const id = Number(parts[2])
+
+    const userExists = users.some(user => user.id === id)
+
+    if (!userExists) {
+
+      res.statusCode = 404
+      res.setHeader('Content-Type', 'application/json')
+
+      res.end(JSON.stringify({
+        error: 'User not found!'
+      }))
+
+      return
+    }
+
+    const user = users.find(user => user.id === id)
+
+    const remainingUsers = users.filter(user => user.id !== id)
+
+    users.length = 0
+    users.push(...remainingUsers)
+
+    res.statusCode = 200
+    res.setHeader('Content-Type', 'application/json')
+
+    res.end(JSON.stringify({
+      message: 'User deleted!',
+      user: user
+    }))
+
+
   } else {
 
     res.statusCode = 404
