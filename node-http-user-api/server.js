@@ -1,3 +1,4 @@
+import { error } from 'console'
 import http from 'http'
 import { json } from 'stream/consumers'
 
@@ -131,6 +132,70 @@ const server = http.createServer((req,res) => {
       }
 
     })
+
+    } else if(req.method === 'PUT' && parts[1] === 'users' && parts[2]) {
+      
+      const id = Number(parts[2])
+
+      const user = users.find(user => user.id === id)
+
+      if(!user) {
+
+        res.statusCode = 404
+        res.setHeader('Content-Type','application/json')
+        res.end(JSON.stringify({
+          error: 'User not found!'
+        }))
+
+        return
+      }
+
+      let body = ''
+
+      req.on('data', (chunk) => {
+        body += chunk.toString()
+      })
+
+      req.on('end', () => {
+
+        try {
+                 const updatedUser = JSON.parse(body)
+        const error = validateUser(updatedUser)
+
+        if(error) {
+
+          res.statusCode = 400
+          res.setHeader('Content-Type','application/json')
+          res.end(JSON.stringify({
+            error: error
+          }))
+
+          return
+         }
+
+         user.name = updatedUser.name
+         user.age = updatedUser.age
+
+         res.statusCode = 200
+         const response = {
+          message: 'User updated',
+          user: user
+         }
+
+         res.setHeader('Content-Type','application/json')
+         res.end(JSON.stringify(response))
+      
+        } catch(error) {
+           
+          
+         res.statusCode = 400
+         res.setHeader('Content-Type','application/json')
+         res.end(JSON.stringify({
+           error: 'Invalid JSON!'
+         }))
+        }
+
+      })
 
   } else {
 
