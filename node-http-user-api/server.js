@@ -51,7 +51,43 @@ const server = http.createServer((req,res) => {
     res.setHeader('Content-Type','application/json')
     res.end(JSON.stringify(user))
 
- 
+    } else if(req.method === 'POST' && req.url === '/users') {
+    
+
+    let body = ''
+
+    req.on('data', (chunk) => {
+      body += chunk.toString()
+    })
+
+    req.on('end', () => {
+
+      try {
+
+         const user = JSON.parse(body)
+
+         user.id = users.length + 1
+         users.push(user)
+
+         res.statusCode = 201
+         const response = {
+          message: 'User created!',
+          user: user
+         }
+
+         res.setHeader('Content-Type','application/json')
+         res.end(JSON.stringify(response))
+
+      } catch(error) {
+
+        res.statusCode = 400
+        res.setHeader('Content-Type','application/json')
+        res.end(JSON.stringify({
+          error: 'Invalid JSON!'
+        }))
+      }
+
+    })
 
   } else {
 
