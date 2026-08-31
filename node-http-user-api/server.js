@@ -1,5 +1,3 @@
-import { error } from "console";
-import { resolve } from "dns";
 import http from "http";
 
 const PORT = 3000;
@@ -99,8 +97,12 @@ function getRequestBody(req) {
   })
 }
 
+
+
 const server = http.createServer( async (req, res) => {
-  const parts = req.url.split("/");
+  
+  const url = new URL(req.url, `http://${req.headers.host}`)
+  const parts = url.pathname.split('/')
 
   // GET /
   if (req.method === "GET" && req.url === "/") {
@@ -109,8 +111,82 @@ const server = http.createServer( async (req, res) => {
     res.end("User Management API");
 
   // GET /users
-  } else if (req.method === "GET" && req.url === "/users") {
-    sendJSON(res, 200, users);
+  } else if (req.method === "GET" && url.pathname === "/users") {
+
+    const name = url.searchParams.get('name')
+    const age = url.searchParams.get('age')
+    const page = Number(url.searchParams.get('page')) || 1
+    const limit = Number(url.searchParams.get('limit')) || 10
+    const sort = url.searchParams.get('sort')
+
+    let filteredUsers = [...users]
+
+
+     if(name && age) {
+
+      const filteredUsers = users.find(user => user.name.toLowerCase() === name.toLowerCase() && user.age === Number(age))
+
+      sendJSON(req,200,filteredUsers)
+
+      return
+    }
+
+
+    if(name) {
+
+      const filteredUsers = users.find(user => user.name.toLowerCase() === name.toLowerCase())
+
+      sendJSON(req,200,filteredUsers)
+
+      return
+    }
+
+    if(age) {
+
+      const ageNumber = Number(age)
+
+   if (!Number.isInteger(ageNumber) || ageNumber < 0) {
+
+    sendJSON(res, 400, {
+      error: "Age must be a valid positive number!"
+    });
+
+    return;
+  }
+
+
+      const filteredUsers = users.find(user => user.age === ageNumber)
+
+      sendJSON(req,200,filteredUsers)
+
+      return
+    }
+
+    if(sort === 'name') {
+
+      filteredUsers.sort((a,b) =>
+      a.name.localeCompare(b.name))
+
+    } else if(sort === 'age') {
+
+      filteredUsers.sort((a,b) => a.age - b.age)
+    }
+
+    const start = (page - 1) * limit
+
+    const paginatedUsers = filteredUsers.slice(start, start + limit)
+    const totalPages = Math.ceil(filteredUsers.length / limit)
+
+
+    sendJSON(res, 200, {
+      data: paginatedUsers,
+      pagination: {
+        page: page,
+        limit: limit,
+        total: paginatedUsers.length,
+        totalPages: totalPages
+      }
+    });
 
   // GET /users/:id
   } else if (req.method === "GET" && parts[1] === "users" && parts[2]) {
