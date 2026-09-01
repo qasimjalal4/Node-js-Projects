@@ -1,12 +1,13 @@
 import { useState,useEffect } from "react"
 import { getTasks, createTask } from "./api/taskApi"
 import TaskForm from "./components/TaskForm"
+import TaskList from "./components/TaskList"
 
 function App() {
   
 
+ 
   const [tasks, setTasks] = useState([])
-  
 
   useEffect(() => {
 
@@ -40,17 +41,9 @@ function App() {
     
      <TaskForm onTaskCreated={handleTaskCreated} />
 
-     {tasks.map((task) => 
-      <div 
-       key={task.id}
-       className="bg-white shadow mb-4 p-4 rounded">
-       <h1
-        className="font-semibold"
-       >{task.title}</h1>
-       <p className="">
-        {task.completed ? 'Completed': 'Pending'}</p>
-      </div>
-     )}
+     <TaskList tasks={tasks} />
+     
+     
     </div>
   )
 }
