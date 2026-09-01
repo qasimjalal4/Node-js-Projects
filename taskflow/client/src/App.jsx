@@ -1,12 +1,12 @@
 import { useState,useEffect } from "react"
 import { getTasks, createTask } from "./api/taskApi"
+import TaskForm from "./components/TaskForm"
 
 function App() {
   
 
   const [tasks, setTasks] = useState([])
-  const [title, setTitle] = useState('')
-  const [isCreating, setIsCreating] = useState(false)
+  
 
   useEffect(() => {
 
@@ -20,72 +20,26 @@ function App() {
 
     loadTasks()
      
-  },[])
+  }, [])
 
 
-  
- 
+  async function handleTaskCreated(title) {
 
-
-  async function handleSubmit(event) {
-
-      
-      event.preventDefault()
-
-      if(!title.trim()) {
-        return
-      }
-    
-    try {
-      
-      setIsCreating(true)
-
-     
-      const task = await createTask(title.trim())
+    const task = await createTask(title.trim())
 
       setTasks(prev => [...prev, task])
-
-      setTitle('')  
-
-
-   } catch(error) {
-
-    console.error(error)
-   } finally {
-
-    setIsCreating(false)
-   } 
+    
   }
-
-  
-
-   
+    
 
   return (
     <div className="min-h-screen p-8 bg-gray-100">
      <h1 className="font-bold text-2xl mb-6">
       TaskFlow
      </h1>
-     <form onSubmit={handleSubmit} 
-      className="mb-6">
-      <input 
-       value={title}
-       onChange={e => setTitle(e.target.value)}
-       placeholder="Enter your task..."
-       className="border p-2 mr-4 rounded w-72"
-       />  
+    
+     <TaskForm onTaskCreated={handleTaskCreated} />
 
-      <button
-      disabled={isCreating}
-       type="submit"
-       className="bg-blue-600 px-8 py-2 border-none cursor-pointer rounded-md text-white font-semibold
-       active:opacity-80 transition-opacity disabled:opacity-50
-       "
-      >
-       {isCreating? 'Adding...' : 'Add'}
-      </button> 
-
-     </form>
      {tasks.map((task) => 
       <div 
        key={task.id}
