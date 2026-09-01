@@ -1,4 +1,5 @@
 import { useState,useEffect } from "react"
+import { getTasks, createTask } from "./api/taskApi"
 
 function App() {
   
@@ -9,13 +10,16 @@ function App() {
 
   useEffect(() => {
 
-    fetch('api/tasks')
-     .then((response) => {
-      return response.json()
-     })
-     .then((data) => {
+    async function loadTasks() {
+
+      const data = await getTasks()
+
       setTasks(data)
-     })
+      
+    }
+
+    loadTasks()
+     
   },[])
 
 
@@ -36,25 +40,12 @@ function App() {
       
       setIsCreating(true)
 
-      const response = await fetch('/api/tasks', {
-      method: 'POST',
-      headers: {
-         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        title: title
-      })
-    })
+     
+      const task = await createTask(title.trim())
 
-    if(!response.ok) {
-      throw new Error(data.error)
-    }
+      setTasks(prev => [...prev, task])
 
-    const data = await response.json()
-
-    setTasks(prev => [...prev, data.task])
-
-     setTitle('')  
+      setTitle('')  
 
 
    } catch(error) {
