@@ -5,7 +5,7 @@ function App() {
 
   const [tasks, setTasks] = useState([])
   const [title, setTitle] = useState('')
-
+  const [isCreating, setIsCreating] = useState(false)
 
   useEffect(() => {
 
@@ -32,7 +32,9 @@ function App() {
         return
       }
     
-    try {  
+    try {
+      
+      setIsCreating(true)
 
       const response = await fetch('/api/tasks', {
       method: 'POST',
@@ -56,8 +58,12 @@ function App() {
 
 
    } catch(error) {
+
     console.error(error)
-   }  
+   } finally {
+
+    setIsCreating(false)
+   } 
   }
 
   
@@ -79,12 +85,13 @@ function App() {
        />  
 
       <button
+      disabled={isCreating}
        type="submit"
        className="bg-blue-600 px-8 py-2 border-none cursor-pointer rounded-md text-white font-semibold
-       active:opacity-80 transition-opacity
+       active:opacity-80 transition-opacity disabled:opacity-50
        "
       >
-       Add
+       {isCreating? 'Adding...' : 'Add'}
       </button> 
 
      </form>
