@@ -34,3 +34,21 @@ export async function createTask(title) {
     return data.task
   
 }
+
+
+export async function updateTask(id,updates) {
+
+  const response = await fetch(`/api/tasks/${id}`, {
+
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(updates)
+  })
+
+  const data = await response.json()
+
+  return data.task
+  
+}

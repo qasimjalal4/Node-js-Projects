@@ -110,9 +110,7 @@ const server = http.createServer(async (req,res) => {
         error: 'Invalid data!'
       }))
       
-      
-
-
+    
       }  
 
     })
@@ -120,6 +118,81 @@ const server = http.createServer(async (req,res) => {
 
     return
   }
+
+
+  if(req.method === 'PATCH' && req.url.startsWith('/api/tasks/')) {
+
+    const id = Number(req.url.split('/')[3])
+
+    if(!Number.isInteger(id)) {
+
+      res.statusCode = 400
+      res.setHeader('Content-Type','application/json')
+      res.end(JSON.stringify({
+        error: 'Invalid task ID'
+      }))
+
+      return
+    }
+
+    let body = ""
+
+    req.on('data', (chunk) => {
+
+      body += chunk.toString()
+    })
+
+    req.on('end', async () => {
+
+      try {
+
+        const updates = JSON.parse(body)
+
+        const tasks = await getTasks()
+
+        const task = tasks.find(task => task.id === id)
+
+        if(!task) {
+
+          res.statusCode = 404
+          res.setHeader('Content-Type','application/json')
+          res.end(JSON.stringify({
+            error: 'Task not found!'
+          }))
+
+           return
+        }
+
+        if(updates.completed !== undefined) {
+          task.completed = updates.completed
+        }
+
+        await saveTasks(tasks)
+
+        res.statusCode = 200
+        res.setHeader("Content-Type","application/json");
+        res.end(JSON.stringify({
+          message: 'Task updated!',
+          task: task
+        }))
+
+        
+      } catch(error) {
+
+        console.error(error)
+
+        res.statusCode = 400
+        res.setHeader("Content-Type","application/json");
+        res.end(JSON.stringify({
+          error: "Invalid data",
+        }));
+
+      }
+    })
+
+    return
+  }
+
 
 })
 
