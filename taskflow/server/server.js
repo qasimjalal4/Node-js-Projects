@@ -168,6 +168,10 @@ const server = http.createServer(async (req,res) => {
           task.completed = updates.completed
         }
 
+        if(updates.title !== undefined) {
+          task.title = updates.title
+        }
+
         await saveTasks(tasks)
 
         res.statusCode = 200

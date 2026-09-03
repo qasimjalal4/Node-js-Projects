@@ -4,6 +4,8 @@ import ConfirmModal from "./ConfirmModal"
 const TaskItem = ({task, onUpdatedTask, onDeletedTask}) => {
 
   const [showModal, setShowModal] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [editedTitle, setEditedTitle] = useState(task.title)
 
  async function handleToggle() {
 
@@ -11,15 +13,57 @@ const TaskItem = ({task, onUpdatedTask, onDeletedTask}) => {
      completed: !task.completed
     })
   }
+
+
+  async function handleSave() {
+
+    if(!editedTitle.trim()) return;
+
+    await onUpdatedTask(task.id, {
+      title: editedTitle.trim()
+    })
+
+
+    setEditing(false)
+    
+  }
   
   return (
    <>
     <div 
        className="bg-white shadow mb-5 p-4 rounded flex justify-between items-center">
       <div>  
-       <h1
+       {editing ? (
+        <> 
+        <input
+         value={editedTitle}
+         onChange={e => setEditedTitle(e.target.value)}
+         placeholder="Change your title"
+         className="border p-2 rounded mr-4"
+        />
+
+         <button
+          onClick={handleSave}
+          className="bg-green-600 text-white px-3 py-1 rounded ml-2"
+        >
+          Save
+        </button>
+
+        <button
+          onClick={() => {
+            setEditedTitle(task.title)
+            setEditing(false)
+          }}
+          className="bg-gray-500 text-white px-3 py-1 rounded ml-2"
+        >
+          Cancel
+        </button>
+       </> 
+       ) : (
+         <h1
         className="font-semibold"
        >{task.title}</h1>
+        )}
        <p>
         {task.completed ? 'Completed': 'Pending'}</p>
        <button
@@ -32,10 +76,15 @@ const TaskItem = ({task, onUpdatedTask, onDeletedTask}) => {
       <div className="mr-8">
        <button
         onClick={() => setShowModal(true)}
-        className="bg-black px-[10px] py-[6px] text-white border-none rounded-md text-sm font-semibold
+        className="bg-red-700 px-[10px] py-[6px] text-white border-none rounded-md text-sm font-semibold
         hover:opacity-80 active:opacity-70 transition-opacity
         "
        >Delete</button>  
+       <button
+        className="bg-black px-[10px] py-[6px] text-white border-none rounded-md text-sm font-semibold
+        hover:opacity-80 active:opacity-70 transition-opacity ml-4"
+        onClick={() => setEditing(true)}
+       >Edit</button>
       </div>  
       </div>
       
