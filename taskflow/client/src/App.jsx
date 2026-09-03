@@ -2,7 +2,7 @@ import { useState,useEffect } from "react"
 import { getTasks, createTask, updateTask, deleteTask } from "./api/taskApi"
 import TaskForm from "./components/TaskForm"
 import TaskList from "./components/TaskList"
-
+import Stats from "./components/Stats"
 
 
 
@@ -52,12 +52,20 @@ function App() {
     
   }
 
+
+  const total = tasks.length
+  const completed = tasks.filter(task => task.completed).length
+  const pending = tasks.filter(task => !task.completed).length
+
+
   return (
     <div className="min-h-screen py-8 pl-8 pr-40 bg-gray-100">
      <h1 className="font-bold text-2xl mb-6">
       TaskFlow
      </h1>
     
+     <Stats total={total} completed={completed} pending={pending} />
+
      <TaskForm  onTaskCreated={handleTaskCreated}   />
 
      <TaskList tasks={tasks} onUpdatedTask={handleUpdatedTask} onDeletedTask={handleDeletedTask}  />

@@ -37,7 +37,7 @@ const TaskForm = ({onTaskCreated}) => {
 
   return (
       <form onSubmit={handleSubmit} 
-      className="mb-6">
+      className="mb-12 mt-8">
       <input 
        value={title}
        onChange={e => setTitle(e.target.value)}
