@@ -42,7 +42,7 @@ const TaskForm = ({onTaskCreated}) => {
        value={title}
        onChange={e => setTitle(e.target.value)}
        placeholder="Enter your task..."
-       className="border p-2 mr-4 rounded w-72"
+       className="border p-2 mr-4 rounded w-80"
        />  
 
       <button

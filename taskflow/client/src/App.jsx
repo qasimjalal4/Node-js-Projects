@@ -3,12 +3,13 @@ import { getTasks, createTask, updateTask, deleteTask } from "./api/taskApi"
 import TaskForm from "./components/TaskForm"
 import TaskList from "./components/TaskList"
 import Stats from "./components/Stats"
-
+import FilterBar from "./components/FilterBar"
 
 
 function App() {
    
   const [tasks, setTasks] = useState([])
+  const [filter, setFilter] = useState('all')
 
   useEffect(() => {
 
@@ -58,8 +59,22 @@ function App() {
   const pending = tasks.filter(task => !task.completed).length
 
 
+  const filteredTasks = tasks.filter((task) => {
+
+    if(filter === 'completed') {
+      return task.completed
+    }
+
+    if(filter === 'pending') {
+      return !task.completed
+    }
+
+    return true
+  })
+
+
   return (
-    <div className="min-h-screen py-8 pl-8 pr-40 bg-gray-100">
+    <div className="min-h-screen py-8 pl-8 pr-96 bg-gray-100">
      <h1 className="font-bold text-2xl mb-6">
       TaskFlow
      </h1>
@@ -68,7 +83,9 @@ function App() {
 
      <TaskForm  onTaskCreated={handleTaskCreated}   />
 
-     <TaskList tasks={tasks} onUpdatedTask={handleUpdatedTask} onDeletedTask={handleDeletedTask}  />
+     <FilterBar filter={filter} setFilter={setFilter} />
+     
+     <TaskList tasks={filteredTasks} onUpdatedTask={handleUpdatedTask} onDeletedTask={handleDeletedTask}  />
      
      
     </div>
