@@ -73,6 +73,17 @@ function App() {
   })
 
 
+
+
+    if (tasks.length === 0) {
+    return (
+      <p className="text-gray-500 text-center mt-8">
+        No tasks found.
+      </p>
+     );
+    }
+
+
   return (
     <div className="min-h-screen py-8 pl-8 pr-96 bg-gray-100">
      <h1 className="font-bold text-2xl mb-6">
@@ -84,7 +95,7 @@ function App() {
      <TaskForm  onTaskCreated={handleTaskCreated}   />
 
      <FilterBar filter={filter} setFilter={setFilter} />
-     
+
      <TaskList tasks={filteredTasks} onUpdatedTask={handleUpdatedTask} onDeletedTask={handleDeletedTask}  />
      
      
