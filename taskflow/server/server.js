@@ -169,6 +169,16 @@ const server = http.createServer(async (req,res) => {
         }
 
         if(updates.title !== undefined) {
+          if(typeof updates.title !== 'string' || !updates.title.trim()) {
+
+            res.statusCode = 400
+            res.setHeader('Content-Type','application/json')
+            res.end(JSON.stringify({
+              error: 'Title is required!'
+            }))
+
+            return
+          }
           task.title = updates.title
         }
 
