@@ -2,6 +2,7 @@ import http from 'http'
 import fs from 'fs/promises'
 import { fileURLToPath } from 'url';
 import path from 'path';
+import { error } from 'console';
  
  
 
@@ -193,6 +194,40 @@ const server = http.createServer(async (req,res) => {
     return
   }
 
+
+  if(req.method === 'DELETE' && req.url.startsWith('/api/tasks/')) {
+
+    const id = Number(req.url.split('/')[3])
+
+    const tasks = await getTasks()
+
+    const taskExist = tasks.some(task => task.id === id)
+
+    if(!taskExist) {
+
+      res.statusCode = 404
+      res.setHeader('Content-Type','application/json')
+      res.end(JSON.stringify({
+        error: 'Task not found!'
+      }))
+
+      return
+    }
+
+    const filteredTasks = tasks.filter(task => task.id !== id)
+
+    await saveTasks(filteredTasks)
+
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+
+    res.end(JSON.stringify({
+      message: "Task deleted!"
+    }));
+
+    return;
+
+  }
 
 })
 

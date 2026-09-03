@@ -52,3 +52,19 @@ export async function updateTask(id,updates) {
   return data.task
   
 }
+
+
+
+export async function deleteTask(id) {
+
+  const response = await fetch(`/api/tasks/${id}`, {
+
+    method: 'DELETE'
+  })
+
+
+  const data = await response.json()
+
+  return data
+  
+}
