@@ -6,6 +6,8 @@ const TaskItem = ({task, onUpdatedTask, onDeletedTask}) => {
   const [showModal, setShowModal] = useState(false)
   const [editing, setEditing] = useState(false)
   const [editedTitle, setEditedTitle] = useState(task.title)
+  const [isSaving, setIsSaving] = useState(false)
+  const [editError, setEditError] = useState(null)
 
  async function handleToggle() {
 
@@ -19,10 +21,22 @@ const TaskItem = ({task, onUpdatedTask, onDeletedTask}) => {
 
     if(!editedTitle.trim()) return;
 
+   try {
+    
+    setIsSaving(true)
+    setEditError(null)
+
     await onUpdatedTask(task.id, {
       title: editedTitle.trim()
     })
 
+  } catch(error) {
+
+    setEditError(error.message)
+
+  } finally {
+    setIsSaving(false)
+  }
 
     setEditing(false)
     
@@ -46,7 +60,7 @@ const TaskItem = ({task, onUpdatedTask, onDeletedTask}) => {
           onClick={handleSave}
           className="bg-green-600 text-white px-3 py-1 rounded ml-2"
         >
-          Save
+          {isSaving ? 'Saving...' : 'Save'}
         </button>
 
         <button
@@ -63,6 +77,12 @@ const TaskItem = ({task, onUpdatedTask, onDeletedTask}) => {
          <h1
         className="font-semibold"
        >{task.title}</h1>
+        )}
+
+        {editError && (
+        <p className="text-red-500 text-sm mt-2">
+         {editError}
+         </p>
         )}
        <p>
         {task.completed ? 'Completed': 'Pending'}</p>
