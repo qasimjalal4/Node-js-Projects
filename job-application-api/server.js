@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { application } from 'express'
 import { jobs, applications } from './data/data'
 
 const app = express()
@@ -204,6 +204,25 @@ app.get('/api/applications', (req,res) => {
   })
 })
 
+
+app.get('/api/applications/:id', (req,res) => {
+
+  const id = Number(req.params.id)
+
+  const application = applications.find(application => application.id === id)
+
+  if(!application) {
+    return res.status(404).json({
+      success: false,
+      message: 'Application not found!'
+    })
+  }
+
+  res.status(200).json({
+    success: true,
+    data: application
+  })
+})
 
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`)
