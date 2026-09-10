@@ -198,9 +198,30 @@ app.delete('/api/jobs/:id', (req,res) => {
 
 app.get('/api/applications', (req,res) => {
 
+
+  const { status, jobId } = req.query
+
+  let result = applications
+
+  if (status === 'applied') {
+    result = result.filter(application => application.status === 'applied')
+  }
+
+  if (status === 'withdrawn') {
+    result = result.filter(application => application.status === 'withdrawn')
+  }
+
+
+  if (jobId) {
+    result = result.filter(
+      application => application.jobId === Number(jobId)
+    )
+  }
+
+
   res.status(200).json({
     success: true,
-    data: applications
+    data: result
   })
 })
 
@@ -278,7 +299,7 @@ app.post('/api/applications', (req, res) => {
   }
 
 
-  applications.push(application)
+  applications.push(newApplication)
 
 
   res.status(201).json({
