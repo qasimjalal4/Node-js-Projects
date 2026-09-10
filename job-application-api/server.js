@@ -146,7 +146,52 @@ app.patch('/api/jobs/:id', (req, res) => {
       data: job
   })
 
+})
 
+
+
+app.delete('/api/jobs/:id', (req,res) => {
+
+  const id = Number(req.params.id)
+
+  const jobExists = jobs.some(job => job.id === id)
+
+  if(!jobExists) {
+    return res.status(404).json({
+      success: false,
+      message: 'Job not found!'
+    })
+  }
+
+  const filteredJobs = jobs.filter(job => job.id !== id)
+
+  jobs.length = 0
+  jobs.push(...filteredJobs)
+
+  res.status(200).json({
+    success: true,
+    message: 'Job deleted successfully!'
+  })
+
+
+
+  /*
+
+  const jobIndex = jobs.findIndex(job => job.id === id)
+
+  if (jobIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: 'Job not found!'
+    })
+  }
+
+
+  jobs.splice(jobIndex, 1)
+
+
+
+  */
 })
 
 
