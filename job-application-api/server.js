@@ -330,6 +330,32 @@ app.post('/api/applications', (req, res) => {
 })
 
 
+app.delete('/api/applications/:id', (req, res) => {
+  const id = Number(req.params.id)
+
+  const applicationIndex = applications.findIndex(
+    application => application.id === id
+  )
+
+  if (applicationIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: 'Application not found!'
+    })
+  }
+
+  applications.splice(applicationIndex, 1)
+
+  return res.status(200).json({
+    success: true,
+    message: 'Application deleted successfully'
+  })
+})
+
+
+
+
+
 })
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`)
