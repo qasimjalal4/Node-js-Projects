@@ -97,6 +97,57 @@ app.post('/api/jobs', (req, res) => {
 })
 
 
+app.patch('/api/jobs/:id', (req, res) => {
+
+  const id = Number(req.params.id)
+
+  const job = jobs.find(job => job.id === id)
+
+  if(!job) {
+    res.status(404).json({
+      success: false,
+      message: 'Job not found!'
+    })
+  }
+
+  const { company, position, available} = req.body
+
+  if(company !== undefined) {
+    if(!company.trim()) {
+      res.status(400).json({
+        success: false,
+        message: 'Company cannot be empty!'
+      })
+    }
+
+    job.company = company.trim()
+
+  }
+
+  if(position !== undefined) {
+    if(!position.trim()) {
+      res.status(400).json({
+        success: false,
+        message: 'Position cannot be empty!'
+      })
+    }
+
+    job.position = position.trim()
+  }
+
+
+  if(available !== undefined) {
+    job.available = true
+  }
+
+
+  res.status(200).json({
+      success: true,
+      data: job
+  })
+
+
+})
 
 
 app.listen(PORT, () => {
