@@ -195,6 +195,16 @@ app.delete('/api/jobs/:id', (req,res) => {
 })
 
 
+
+app.get('/api/applications', (req,res) => {
+
+  res.status(200).json({
+    success: true,
+    data: applications
+  })
+})
+
+
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`)
 })
