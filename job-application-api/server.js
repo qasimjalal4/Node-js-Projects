@@ -60,6 +60,27 @@ app.get('/api/jobs/:id', (req,res) => {
 })
 
 
+app.post('/api/jobs', (req, res) => {
+
+  const { company, position, available } = req.body
+
+  const newJob = {
+    id: jobs.length > 0 ? Math.max(...jobs.map(job => job.id)) + 1 : 1,
+    company,
+    position,
+    available
+  }
+
+
+  jobs.push(newJob)
+
+  res.status(201).json({
+    success: true,
+    data: jobs
+  })
+})
+
+
 
 
 app.listen(PORT, () => {
