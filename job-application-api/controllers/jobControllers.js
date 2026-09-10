@@ -1,0 +1,188 @@
+import { jobs } from "../data/data";
+
+
+
+export const getJobs =  (req,res) => {
+
+  const { available, company } = req.query
+
+  let result = jobs
+
+  if(available === 'true') {
+    result =  result.filter(job => job.available === true)
+  }
+
+  if(company) {
+    result = result.filter(job => job.company === company)
+  }
+
+  if(company && available === 'true') {
+    result = result.filter(job => job.company === company && job.available === true)
+  }
+
+
+  res.status(200).json({
+    success: true,
+    data: result
+  })
+}
+
+
+
+export const getJobById = (req,res) => {
+
+  const id = Number(req.params.id)
+
+  const job = jobs.find(job => job.id === id)
+
+  if(!job) {
+    return res.status(404).json({
+      success: false,
+      message: 'Job not found!'
+    })
+  }
+
+  res.status(200).json({
+    success: true,
+    data: job
+  })
+}
+
+
+
+export const createJob = (req, res) => {
+
+  const { company, position, available } = req.body
+
+  
+  if (!company || !company.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Company is required"
+    })
+  }
+
+  if (!position || !position.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Position is required"
+    })
+  }
+
+  const newJob = {
+    id: jobs.length > 0 ? Math.max(...jobs.map(job => job.id)) + 1 : 1,
+    company,
+    position,
+    available
+  }
+
+
+  jobs.push(newJob)
+
+  res.status(201).json({
+    success: true,
+    data: jobs
+  })
+}
+
+
+
+
+
+export const updateJob  = (req, res) => {
+
+  const id = Number(req.params.id)
+
+  const job = jobs.find(job => job.id === id)
+
+  if(!job) {
+    res.status(404).json({
+      success: false,
+      message: 'Job not found!'
+    })
+  }
+
+  const { company, position, available} = req.body
+
+  if(company !== undefined) {
+    if(!company.trim()) {
+      res.status(400).json({
+        success: false,
+        message: 'Company cannot be empty!'
+      })
+    }
+
+    job.company = company.trim()
+
+  }
+
+  if(position !== undefined) {
+    if(!position.trim()) {
+      res.status(400).json({
+        success: false,
+        message: 'Position cannot be empty!'
+      })
+    }
+
+    job.position = position.trim()
+  }
+
+
+  if(available !== undefined) {
+    job.available = true
+  }
+
+
+  res.status(200).json({
+      success: true,
+      data: job
+  })
+
+}
+
+
+
+
+export const deleteJob = (req,res) => {
+
+  const id = Number(req.params.id)
+
+  const jobExists = jobs.some(job => job.id === id)
+
+  if(!jobExists) {
+    return res.status(404).json({
+      success: false,
+      message: 'Job not found!'
+    })
+  }
+
+  const filteredJobs = jobs.filter(job => job.id !== id)
+
+  jobs.length = 0
+  jobs.push(...filteredJobs)
+
+  res.status(200).json({
+    success: true,
+    message: 'Job deleted successfully!'
+  })
+
+
+
+  /*
+
+  const jobIndex = jobs.findIndex(job => job.id === id)
+
+  if (jobIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: 'Job not found!'
+    })
+  }
+
+
+  jobs.splice(jobIndex, 1)
+
+
+
+  */
+}
