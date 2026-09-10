@@ -224,6 +224,70 @@ app.get('/api/applications/:id', (req,res) => {
   })
 })
 
+
+
+
+app.post('/api/applications', (req, res) => {
+
+  const { jobId, applicantName } = req.body
+
+  if(!applicantName.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: 'Applicant name is required!'
+    })
+  }
+
+  const job = jobs.find(job => job.id === jobId)
+
+  if(!job) {
+    return res.status(404).json({
+      success: false,
+      message: 'Job not found!'
+    })
+  }
+
+  if(!job.available) {
+    return res.status(409).json({
+      success: false,
+      message: 'This job is no longer available'
+    })
+  }
+
+    const alreadyApplied = applications.some(
+    application =>
+      application.jobId === Number(jobId) &&
+      application.applicantName === applicantName.trim()
+  )
+
+  if (alreadyApplied) {
+    return res.status(409).json({
+      success: false,
+      message: 'You have already applied to this job!'
+    })
+  }
+
+
+
+
+  const newApplication = {
+    id: applications > 0 ? Math.max(...applications.map(application => application.id)) + 1 : 1,
+    jobId,
+    applicantName,
+    status: 'applied'
+  }
+
+
+  applications.push(application)
+
+
+  res.status(201).json({
+    success: true,
+    message: 'Applied successfully!'
+  })
+
+
+})
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`)
 })
