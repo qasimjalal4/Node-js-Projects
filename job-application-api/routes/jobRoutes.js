@@ -1,7 +1,14 @@
 import express from 'express'
-
+import { jobs } from '../data/data'
 
 const router = express.Router()
+
+
+
+
+
+
+
 
 router.get('/', (req,res) => {
 
@@ -29,6 +36,7 @@ router.get('/', (req,res) => {
 })
 
 
+
 router.get('/:id', (req,res) => {
 
   const id = Number(req.params.id)
@@ -47,6 +55,7 @@ router.get('/:id', (req,res) => {
     data: job
   })
 })
+
 
 
 
@@ -84,6 +93,8 @@ router.post('/', (req, res) => {
     data: jobs
   })
 })
+
+
 
 
 
@@ -137,6 +148,7 @@ router.patch('/:id', (req, res) => {
   })
 
 })
+
 
 
 
