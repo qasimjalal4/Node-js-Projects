@@ -4,6 +4,7 @@ import { jobs, applications } from './data/data'
 const app = express()
 const PORT = 3000
 
+app.use(express.json())
 
 app.get('/', (req,res) => {
   res.status(200).json({
@@ -63,6 +64,21 @@ app.get('/api/jobs/:id', (req,res) => {
 app.post('/api/jobs', (req, res) => {
 
   const { company, position, available } = req.body
+
+  
+  if (!company || !company.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Company is required"
+    })
+  }
+
+  if (!position || !position.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Position is required"
+    })
+  }
 
   const newJob = {
     id: jobs.length > 0 ? Math.max(...jobs.map(job => job.id)) + 1 : 1,
