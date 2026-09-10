@@ -40,6 +40,27 @@ app.get('/api/jobs', (req,res) => {
 
 
 
+app.get('/api/jobs/:id', (req,res) => {
+
+  const id = Number(req.params.id)
+
+  const job = jobs.find(job => job.id === id)
+
+  if(!job) {
+    return res.status(404).json({
+      success: false,
+      message: 'Job not found!'
+    })
+  }
+
+  res.status(200).json({
+    success: true,
+    data: job
+  })
+})
+
+
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`)
