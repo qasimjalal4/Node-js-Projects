@@ -287,6 +287,49 @@ app.post('/api/applications', (req, res) => {
   })
 
 
+  app.patch('/api/applications/:id', (req, res) => {
+  const id = Number(req.params.id)
+
+  const application = applications.find(
+    application => application.id === id
+  )
+
+  // Application doesn't exist
+  if (!application) {
+    return res.status(404).json({
+      success: false,
+      message: 'Application not found!'
+    })
+  }
+
+  const { status } = req.body
+
+  // Only allow "withdrawn"
+  if (status !== 'withdrawn') {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid status!'
+    })
+  }
+
+  // Already withdrawn
+  if (application.status === 'withdrawn') {
+    return res.status(409).json({
+      success: false,
+      message: 'Application is already withdrawn!'
+    })
+  }
+
+  // Update status
+  application.status = 'withdrawn'
+
+  return res.status(200).json({
+    success: true,
+    data: application
+  })
+})
+
+
 })
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`)
