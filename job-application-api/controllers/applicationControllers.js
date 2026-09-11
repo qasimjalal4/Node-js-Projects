@@ -40,7 +40,7 @@ export const getApplicationById = (req,res) => {
 
    } catch(error) {
     
-    res.status(404).json({
+    res.status(error.statusCode).json({
       success: false,
       message: error.message
     })
@@ -69,7 +69,7 @@ export const createApplication = (req, res) => {
 
    } catch(error) {
 
-    res.status(400).json({
+    res.status(error.statusCode).json({
       success: false,
       message: error.message
     })
@@ -90,7 +90,7 @@ export const updateApplication = (req, res) => {
 
   // Application doesn't exist
   if (!application) {
-    return res.status(404).json({
+    return res.status(error.statusCode).json({
       success: false,
       message: 'Application not found!'
     })
@@ -141,7 +141,7 @@ export const deleteApplication = (req, res) => {
 
   } catch(error) {
 
-    res.status(404).json({
+    res.status(error.statusCode).json({
       success: false,
       message: error.message
     })

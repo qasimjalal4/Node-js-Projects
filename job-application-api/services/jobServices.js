@@ -1,4 +1,7 @@
 import { jobs } from "../data/data";
+import NotFoundError from "../errors/NotFoundError"; 
+import BadRequestError from "../errors/BadRequestError";
+
 
 
 export const getJobs = (available, company) => {
@@ -28,7 +31,7 @@ export const getJobById = (id) => {
   const job = jobs.find(job => job.id === id)
 
   if(!job) {
-    throw new Error('Job not found!')
+    throw new NotFoundError('Job not found!')
   }
 
   return job
@@ -45,11 +48,11 @@ export const createJob = (company, position, available) => {
 
 
   if (!company || !company.trim()) {
-    throw new Error("Company is required")
+    throw new BadRequestError("Company is required")
   }
 
   if (!position || !position.trim()) {
-     throw new Error("Position is required")
+     throw new BadRequestError("Position is required")
   }
 
   const newJob = {
@@ -76,12 +79,12 @@ export const updateJob = (id, company, position, available) => {
   const job = jobs.find(job => job.id === id)
 
    if(!job) {
-    throw new Error('Job not found!')
+    throw new NotFoundError('Job not found!')
    }
 
    if (company !== undefined) {
     if (!company.trim()) {
-      throw new Error("Company cannot be empty!")
+      throw new BadRequestError("Company cannot be empty!")
     }
 
     job.company = company.trim()
@@ -89,7 +92,7 @@ export const updateJob = (id, company, position, available) => {
 
   if (position !== undefined) {
     if (!position.trim()) {
-      throw new Error("Position cannot be empty!")
+      throw new BadRequestError("Position cannot be empty!")
     }
 
     job.position = position.trim()
@@ -114,7 +117,7 @@ export const deleteJob = (id) => {
    const jobExists = jobs.some(job => job.id === id)
 
    if(!jobExists) {
-     throw new Error('Job not found!')
+     throw new NotFoundError('Job not found!')
    }
 
    const filteredJobs = jobs.filter(job => job.id !== id)

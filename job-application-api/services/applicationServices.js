@@ -1,4 +1,7 @@
 import { jobs, applications } from "../data/data";
+import NotFoundError from "../errors/NotFoundError";
+import BadRequestError from "../errors/BadRequestError";
+import ConflictError from "../errors/ConflictError";
 
 
 
@@ -32,7 +35,7 @@ export const getApplicationById = (id) => {
   const application = applications.find(application => application.id === id)
 
   if(!application) {
-    throw new Error('Application not found!')
+    throw new NotFoundError('Application not found!')
   }
 
   return application
@@ -43,18 +46,18 @@ export const getApplicationById = (id) => {
 export const createApplication = (jobId, applicantName) => {
 
   if(!applicantName.trim()) {
-     throw new Error('Applicant name is required!')
+     throw new BadRequestError('Applicant name is required!')
   }
 
   const job = jobs.find(job => job.id === jobId)
 
   if(!job) {
-    throw new Error('Job not found!')
+    throw new NotFoundError('Job not found!')
   }
 
 
   if(!job.available) {
-    throw new Error('This job is no longer available')
+    throw new NotFoundError('This job is no longer available')
   }
 
     const alreadyApplied = applications.some(
@@ -64,7 +67,7 @@ export const createApplication = (jobId, applicantName) => {
   )
 
   if (alreadyApplied) {
-    throw new Error('You have already applied to this job!')
+    throw new ConflictError('You have already applied to this job!')
   }
 
 
@@ -96,7 +99,7 @@ export const deleteApplication = (id) => {
 
 
    if (applicationIndex === -1) {
-     throw new Error('Application not found!')
+     throw new NotFoundError('Application not found!')
    }
 
   applications.splice(applicationIndex, 1) 
