@@ -1,24 +1,17 @@
 import { jobs } from "../data/data";
-
+import { getJobs as getJobsService,
+         getJobById as getJobByIdService,
+         createJob as createJobService,
+         updateJob as updateJobService
+         deleteJob as deleteJobService
+        } from "../services/jobServices";
 
 
 export const getJobs =  (req,res) => {
 
   const { available, company } = req.query
 
-  let result = jobs
-
-  if(available === 'true') {
-    result =  result.filter(job => job.available === true)
-  }
-
-  if(company) {
-    result = result.filter(job => job.company === company)
-  }
-
-  if(company && available === 'true') {
-    result = result.filter(job => job.company === company && job.available === true)
-  }
+  const result = getJobsService( available, company)
 
 
   res.status(200).json({
@@ -33,19 +26,22 @@ export const getJobById = (req,res) => {
 
   const id = Number(req.params.id)
 
-  const job = jobs.find(job => job.id === id)
+  try {
 
-  if(!job) {
-    return res.status(404).json({
+    const job = getJobByIdService(id)
+
+
+    res.status(200).json({
+      success: true,
+      data: job
+    })
+
+  } catch(error) {
+    res.status(404).json({
       success: false,
-      message: 'Job not found!'
+      message: error.message
     })
   }
-
-  res.status(200).json({
-    success: true,
-    data: job
-  })
 }
 
 
@@ -54,35 +50,22 @@ export const createJob = (req, res) => {
 
   const { company, position, available } = req.body
 
-  
-  if (!company || !company.trim()) {
-    return res.status(400).json({
-      success: false,
-      message: "Company is required"
+  try {
+   
+    const jobs = createJobService(company,position,available)
+
+    res.status(201).json({
+      success: true,
+      data: jobs
     })
-  }
 
-  if (!position || !position.trim()) {
-    return res.status(400).json({
+  } catch(error) {
+
+     res.status(400).json({
       success: false,
-      message: "Position is required"
-    })
-  }
-
-  const newJob = {
-    id: jobs.length > 0 ? Math.max(...jobs.map(job => job.id)) + 1 : 1,
-    company,
-    position,
-    available
-  }
-
-
-  jobs.push(newJob)
-
-  res.status(201).json({
-    success: true,
-    data: jobs
-  })
+      message: error.message
+     }) 
+  }  
 }
 
 
@@ -95,48 +78,25 @@ export const updateJob  = (req, res) => {
 
   const job = jobs.find(job => job.id === id)
 
-  if(!job) {
-    res.status(404).json({
-      success: false,
-      message: 'Job not found!'
-    })
-  }
-
   const { company, position, available} = req.body
 
-  if(company !== undefined) {
-    if(!company.trim()) {
-      res.status(400).json({
-        success: false,
-        message: 'Company cannot be empty!'
-      })
-    }
+ 
+  try {
 
-    job.company = company.trim()
+    const job = updateJobService(id, company, position, available)
 
-  }
-
-  if(position !== undefined) {
-    if(!position.trim()) {
-      res.status(400).json({
-        success: false,
-        message: 'Position cannot be empty!'
-      })
-    }
-
-    job.position = position.trim()
-  }
-
-
-  if(available !== undefined) {
-    job.available = true
-  }
-
-
-  res.status(200).json({
+    res.status(200).json({
       success: true,
       data: job
-  })
+    })
+
+  } catch(error) {
+
+     res.status(400).json({
+      success: false,
+      message: error.message
+    })
+  }
 
 }
 
@@ -147,24 +107,30 @@ export const deleteJob = (req,res) => {
 
   const id = Number(req.params.id)
 
-  const jobExists = jobs.some(job => job.id === id)
+  
+  try {
+    
+    const jobs = deleteJobService(id)
 
-  if(!jobExists) {
-    return res.status(404).json({
+    res.status(200).json({
+      success: true,
+      data: jobs
+    })
+
+  } catch(error) {
+
+    res.status(404).json({
       success: false,
-      message: 'Job not found!'
+      message: error.message
     })
   }
 
-  const filteredJobs = jobs.filter(job => job.id !== id)
 
-  jobs.length = 0
-  jobs.push(...filteredJobs)
+ 
 
-  res.status(200).json({
-    success: true,
-    message: 'Job deleted successfully!'
-  })
+   
+
+  
 
 
 
