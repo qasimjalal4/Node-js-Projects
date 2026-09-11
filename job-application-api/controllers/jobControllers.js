@@ -2,7 +2,7 @@ import { jobs } from "../data/data";
 import { getJobs as getJobsService,
          getJobById as getJobByIdService,
          createJob as createJobService,
-         updateJob as updateJobService
+         updateJob as updateJobService,
          deleteJob as deleteJobService
         } from "../services/jobServices";
 
