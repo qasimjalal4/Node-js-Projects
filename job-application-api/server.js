@@ -2,6 +2,7 @@ import express from 'express'
 import { jobs, applications } from './data/data'
 import jobRouter from './routes/jobRoutes'
 import applicationRouter from './routes/applicationRoutes'
+import { errorHandler } from './middlewares/errorHandler'
 
 const app = express()
 const PORT = 3000
@@ -40,6 +41,7 @@ app.use('/api/applications/:id', applicationRouter)
 app.use('/api/applications/:id', applicationRouter)
 
 
+app.use(errorHandler)
 
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`)

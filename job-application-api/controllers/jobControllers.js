@@ -37,10 +37,8 @@ export const getJobById = (req,res) => {
     })
 
   } catch(error) {
-    res.status(error.statusCode).json({
-      success: false,
-      message: error.message
-    })
+    
+    next(error)
   }
 }
 
@@ -61,10 +59,7 @@ export const createJob = (req, res) => {
 
   } catch(error) {
 
-     res.status(error.statusCode).json({
-      success: false,
-      message: error.message
-     }) 
+    next(error)
   }  
 }
 
@@ -92,10 +87,7 @@ export const updateJob  = (req, res) => {
 
   } catch(error) {
 
-     res.status(error.statusCode).json({
-      success: false,
-      message: error.message
-    })
+    next(error)
   }
 
 }
@@ -119,10 +111,7 @@ export const deleteJob = (req,res) => {
 
   } catch(error) {
 
-    res.status(error.statusCode).json({
-      success: false,
-      message: error.message
-    })
+    next(error)
   }
 
 

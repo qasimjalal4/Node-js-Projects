@@ -40,11 +40,7 @@ export const getApplicationById = (req,res) => {
 
    } catch(error) {
     
-    res.status(error.statusCode).json({
-      success: false,
-      message: error.message
-    })
-
+     next(error)
    }
 
 }
@@ -69,10 +65,7 @@ export const createApplication = (req, res) => {
 
    } catch(error) {
 
-    res.status(error.statusCode).json({
-      success: false,
-      message: error.message
-    })
+    next(error)
    }
 
 }
@@ -141,10 +134,7 @@ export const deleteApplication = (req, res) => {
 
   } catch(error) {
 
-    res.status(error.statusCode).json({
-      success: false,
-      message: error.message
-    })
+    next(error)
   }
 }
 
